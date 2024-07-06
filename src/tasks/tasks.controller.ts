@@ -1,11 +1,31 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  InternalServerErrorException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseFilters,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 
+import { TaskStatus } from './enums/task-status.enum';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+
 @Controller('tasks')
+@UseFilters(HttpExceptionFilter)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
+
+  @Get('/test')
+  testEndpoint() {
+    throw new InternalServerErrorException('This is a test error');
+  }
 
   @Get()
   getTasks(@Query() filterDto: GetTasksFilterDto) {
@@ -22,30 +42,16 @@ export class TasksController {
     return await this.tasksService.create(createTaskDto);
   }
 
-  // @Get()
-  // getTasks(@Query() filterDto: GetTasksFilterDto): Task[] {
-  //   if (Object.keys(filterDto).length) {
-  //     return this.tasksService.getTasksWithFilters(filterDto);
-  //   } else {
-  //     return this.tasksService.getAllTasks();
-  //   }
-  // }
+  @Delete(':id')
+  async deleteTask(@Param('id') id: string) {
+    await this.tasksService.remove(id);
+  }
 
-  // @Get(':id')
-  // getTaskById(@Param('id') id: string): Task {
-  //   return this.tasksService.getTaskById(id);
-  // }
-
-  // @Delete(':id')
-  // deleteTask(@Param('id') id: string): void {
-  //   this.tasksService.deleteTask(id);
-  // }
-
-  // @Patch(':id/status')
-  // updateTaskStatus(
-  //   @Param('id') id: string,
-  //   @Body('status') status: TaskStatus,
-  // ): Task {
-  //   return this.tasksService.updateTask(id, status);
-  // }
+  @Patch(':id/status')
+  async updateTaskStatus(
+    @Param('id') id: string,
+    @Body('status') status: TaskStatus,
+  ) {
+    return this.tasksService.updateTask(id, status);
+  }
 }
