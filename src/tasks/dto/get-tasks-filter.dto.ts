@@ -1,6 +1,5 @@
-import { TaskStatus } from '../task.model';
+import { TaskStatus } from '../enums/task-status.enum';
 
-// Reto
 export class GetTasksFilterDto {
   status?: TaskStatus;
   search?: string;
