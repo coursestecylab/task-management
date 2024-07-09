@@ -15,10 +15,9 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 
 import { TaskStatus } from './enums/task-status.enum';
-import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
 
 @Controller('tasks')
-@UseFilters(HttpExceptionFilter)
+// @UseFilters(HttpExceptionFilter)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
