@@ -10,7 +10,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UserRepository {
+export class UsersRepository {
   constructor(
     @InjectRepository(User) public readonly repository: Repository<User>,
   ) {}
