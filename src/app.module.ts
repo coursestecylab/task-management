@@ -27,16 +27,7 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [],
-  // providers: [
-  //   {
-  //     provide: APP_FILTER,
-  //     useClass: HttpExceptionFilter,
-  //   },
-  //   {
-  //     provide: APP_INTERCEPTOR,
-  //     useClass: LoggingInterceptor,
-  //   },
-  // ],
+  providers: [],
   exports: [],
 })
 export class AppModule {}
