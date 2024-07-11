@@ -37,27 +37,27 @@ jobs:
           docker build -t $ECR_REPOSITORY_URI:latest .
           docker push $ECR_REPOSITORY_URI:latest
 
-          - name: Create update-config.json file
-          env:
-            ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
-            SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
-            ACCESS_ROLE_ARN: ${{ secrets.ACCESS_ROLE_ARN }}
-          run: |
-            echo '{
-              "ServiceArn": "'$SERVICE_ARN'",
-              "SourceConfiguration": {
-                "ImageRepository": {
-                  "ImageIdentifier": "'$ECR_REPOSITORY_URI':latest",
-                  "ImageConfiguration": {
-                    "Port": "8080"
-                  },
-                  "ImageRepositoryType": "ECR"
+      - name: Create update-config.json file
+        env:
+          ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
+          SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+          ACCESS_ROLE_ARN: ${{ secrets.ACCESS_ROLE_ARN }}
+        run: |
+          echo '{
+            "ServiceArn": "'$SERVICE_ARN'",
+            "SourceConfiguration": {
+              "ImageRepository": {
+                "ImageIdentifier": "'$ECR_REPOSITORY_URI':latest",
+                "ImageConfiguration": {
+                  "Port": "8080"
                 },
-                "AuthenticationConfiguration": {
-                  "AccessRoleArn": "'$ACCESS_ROLE_ARN'"
-                }
+                "ImageRepositoryType": "ECR"
+              },
+              "AuthenticationConfiguration": {
+                "AccessRoleArn": "'$ACCESS_ROLE_ARN'"
               }
-            }' > update-config.json
+            }
+          }' > update-config.json
 
       - name: Deploy to AWS App Runner
         run: |
