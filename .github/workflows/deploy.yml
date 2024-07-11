@@ -37,12 +37,28 @@ jobs:
           docker build -t $ECR_REPOSITORY_URI:latest .
           docker push $ECR_REPOSITORY_URI:latest
 
+          - name: Create update-config.json file
+          env:
+            ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
+            SERVICE_ARN: ${{ secrets.APP_RUNNER_SERVICE_ARN }}
+            ACCESS_ROLE_ARN: ${{ secrets.ACCESS_ROLE_ARN }}
+          run: |
+            echo '{
+              "ServiceArn": "'$SERVICE_ARN'",
+              "SourceConfiguration": {
+                "ImageRepository": {
+                  "ImageIdentifier": "'$ECR_REPOSITORY_URI':latest",
+                  "ImageConfiguration": {
+                    "Port": "8080"
+                  },
+                  "ImageRepositoryType": "ECR"
+                },
+                "AuthenticationConfiguration": {
+                  "AccessRoleArn": "'$ACCESS_ROLE_ARN'"
+                }
+              }
+            }' > update-config.json
+
       - name: Deploy to AWS App Runner
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
         run: |
-          aws apprunner create-service \
-          --service-name task-management-app \
-          --source-configuration ImageRepository="{ImageIdentifier=$ECR_REPOSITORY_URI:latest,ImageRepositoryType=ECR}" \
-          --region $AWS_REGION
+          aws apprunner update-service --cli-input-json file://update-config.json --region ${{ secrets.AWS_REGION }}
