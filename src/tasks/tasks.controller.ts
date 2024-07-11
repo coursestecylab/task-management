@@ -8,16 +8,19 @@ import {
   Patch,
   Post,
   Query,
-  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 
 import { TaskStatus } from './enums/task-status.enum';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { User } from 'src/auth/entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('tasks')
-// @UseFilters(HttpExceptionFilter)
+@UseGuards(AuthGuard('jwt'))
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
@@ -27,30 +30,34 @@ export class TasksController {
   }
 
   @Get()
-  getTasks(@Query() filterDto: GetTasksFilterDto) {
-    return this.tasksService.getTasks(filterDto);
+  getTasks(@Query() filterDto: GetTasksFilterDto, @GetUser() user: User) {
+    return this.tasksService.getTasks(filterDto, user);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.tasksService.findOne(id);
+  async getTaskById(@Param('id') id: string, @GetUser() user: User) {
+    return await this.tasksService.getTaskById(id, user);
   }
 
   @Post()
-  async createTask(@Body() createTaskDto: CreateTaskDto) {
-    return await this.tasksService.create(createTaskDto);
+  async createTask(
+    @Body() createTaskDto: CreateTaskDto,
+    @GetUser() user: User,
+  ) {
+    return await this.tasksService.createTask(createTaskDto, user);
   }
 
   @Delete(':id')
-  async deleteTask(@Param('id') id: string) {
-    await this.tasksService.remove(id);
+  async deleteTask(@Param('id') id: string, @GetUser() user: User) {
+    await this.tasksService.deleteTask(id, user);
   }
 
   @Patch(':id/status')
   async updateTaskStatus(
     @Param('id') id: string,
     @Body('status') status: TaskStatus,
+    @GetUser() user: User,
   ) {
-    return this.tasksService.updateTask(id, status);
+    return this.tasksService.updateTaskStatus(id, status, user);
   }
 }

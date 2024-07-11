@@ -20,7 +20,7 @@ export class AuthService {
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
     const { username, password } = authCredentialsDto;
-    const user = await this.usersRepository.repository.findOne({
+    const user = await this.usersRepository.findOne({
       where: { username },
     });
 
